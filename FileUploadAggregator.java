@@ -1,12 +1,19 @@
 package com.citi.cards.aggregator;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 import org.springframework.stereotype.Component;
 
 import com.citi.cards.requestBean.FileUploadRequest;
@@ -56,5 +63,29 @@ public class FileUploadAggregator {
 		} catch(Exception e) {}		
 	}
 	
+		public void readCSV() {
+		BufferedReader bufferedReader = null;
+		CSVParser parser = null;
+		List<InsurUsers> list = new LinkedList();
+
+		try {
+			
+			bufferedReader = new BufferedReader(new FileReader(FILE_READ_PATH));
+			parser = new CSVParser(bufferedReader, CSVFormat.DEFAULT.withFirstRecordAsHeader());
+			for(CSVRecord csvRecord : parser) {
+				list.add(new InsurUsers((String)csvRecord.get("userId"), csvRecord.get("firstName"), csvRecord.get("lastName"), new Integer(csvRecord.get("version")), csvRecord.get("company")));
+			}
+			
+		} catch(Exception e) {
+			
+		} finally {
+			try {
+				if(parser != null)	parser.close();
+				if(bufferedReader != null) bufferedReader.close();
+			} catch (IOException e) {
+			}
+		}
+	}
+
 }
 
